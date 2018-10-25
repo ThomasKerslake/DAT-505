@@ -88,11 +88,11 @@ function geometry(){
 var render = function () {
   requestAnimationFrame( render );
 
-  mesh.rotation.x += 0.002; //Continuously rotate the mesh
+  mesh.rotation.x += 0.001; //Continuously rotate the mesh
   mesh.rotation.y += 0.002;
   mesh2.rotation.x += 0.005;
   mesh2.rotation.y += 0.005;
-  mesh3.rotation.x += 0.01;
+  mesh3.rotation.x += 0.02;
   mesh3.rotation.y += 0.01;
 
   renderer.setClearColor("#55496b");
