@@ -26,7 +26,7 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.z = 400;
+  camera.position.z = 330;
   scene.add(camera);
 
   particle = new THREE.Object3D();
