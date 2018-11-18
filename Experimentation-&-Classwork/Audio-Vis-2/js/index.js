@@ -92,7 +92,7 @@ class Visualization{
 
     addParticles(){
         let particle,i;
-        for (i = 0; i < 200; i++) {
+        for (i = 0; i < this.particles; i++) {
 						this.box = new THREE.BoxGeometry(3, 3, 3);
 						this.boxMat = new THREE.MeshLambertMaterial({
               color:0xd639e5,
@@ -145,6 +145,6 @@ class Visualization{
 
 //On load run class
 $(function(){
-    var animate = new Visualization({particles: 1024, ease: 0.08});
+    var animate = new Visualization({particles: 150, ease: 0.08});
     animate.init();
 });
