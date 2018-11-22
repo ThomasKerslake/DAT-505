@@ -71,10 +71,24 @@ class Visualization{
         $('input, label').remove();
     }
 
+      addLight(){
+
+        requestAnimationFrame(this.addLight.bind(this));
+    //  var lights = [];
+      // lights[0] = new THREE.DirectionalLight( 0xffffff, 1 );
+      //  lights[0].position.set( 1, 0, 0 );
+      //  lights[1] = new THREE.DirectionalLight( 0x70a6ff, 1 );
+      //  lights[1].position.set( 0.75, 1, 0.5 );
+      //  lights[2] = new THREE.DirectionalLight( 0xf46f4e, 1 );
+      //  lights[2].position.set( -0.75, -1, 0.5 );
+      //  this.scene.add( lights[0] );
+      //  this.scene.add( lights[1] );
+      //  this.scene.add( lights[2] );
+      }
 
     render(){
         requestAnimationFrame(this.render.bind(this));
-        for (let i=0; i<this.scene.children.length; i++) {
+        for (let i=0; i<(this.scene.children.length)-1; i++) {
             //Choose Shape to render
             this[this.shape](this.particlesStored[i],i, this.frequencyData[i]);
         }
@@ -92,17 +106,21 @@ class Visualization{
 
     addParticles(){
         let particle,i;
+        var light1 = new THREE.AmbientLight(0xffffff, 0.5);
+        this.scene.add(light1);
         for (i = 0; i < this.particles; i++) {
 						this.box = new THREE.BoxGeometry(3, 3, 3);
-						this.boxMat = new THREE.MeshLambertMaterial({
-              color:0xd639e5,
-              emissive:0xcd3bdb,
+						this.boxMat = new THREE.MeshPhongMaterial({
+             color:0x93bcff,
+              emissive:0x93bcff
             });
-            particle  = new THREE.Mesh(this.box, this.boxMat);
+           particle  = new THREE.Mesh(this.box, this.boxMat);
+
             this.scene.add(particle);
             this.particlesStored.push(particle);
         }
     }
+
 
 	//ring(part, index,frequency){
   //  var v = (index + 1000 + frequency * 0.5) * 0.05;
@@ -133,12 +151,11 @@ class Visualization{
     //   }
 
     //Clam
-     clam(part, index,frequency){
-          var v = (index + 100 + frequency * 0.5) * 0.2;
-           part.position.x += ((Math.sin(index * 100) * v) - part.position.x) * this.ease;
-          part.position.y += ((Math.cos(index * 100) * v) - part.position.y) * this.ease;
-          part.position.z += ((frequency * this.ease * 3.5) - part.position.z) * this.ease;
-
+     clam(c,index,frequency){
+       var v = (index + 100 + frequency * 0.5) * 0.2;
+      c.position.x += ((Math.sin(index * 100) * v) - c.position.x) * this.ease;
+      c.position.y += ((Math.cos(index * 100) * v) - c.position.y) * this.ease;
+      c.position.z += ((frequency * this.ease * 3.5) - c.position.z) * this.ease;
       }
 
 }
