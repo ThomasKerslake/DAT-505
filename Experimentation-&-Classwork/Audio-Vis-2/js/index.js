@@ -6,13 +6,15 @@ class Visualization{
         this.ease = options.ease;
         //particle storage
         this.particlesStored = [];
+        //This is a
+        this.segregation = 1;
     }
 
     init(){
         //Start of the Init
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 110, window.innerWidth / window.innerHeight, 0.1, 5000 );
-        this.renderer = new THREE.WebGLRenderer({ alpha: true });
+        this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setClearColor( 0x000000, 0 );
         this.camera.position.set(0, 0, 100);
 
@@ -22,7 +24,7 @@ class Visualization{
         this.renderer.autoClear = false;
         this.renderer.setClearColor(0x000000, 0.0);
         this.index = 0;
-        this.shape = 'clam';
+        this.shape = ['clam','speaker','ring','line'];
 
         //Setting up the Orbit Controls
         this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
@@ -32,6 +34,7 @@ class Visualization{
 
         this.render();
         this.addParticles();
+        this.addLight();
 
         //Add listeners
         $(window).on('resize', this.resize.bind(this));
@@ -71,28 +74,14 @@ class Visualization{
         $('input, label').remove();
     }
 
-      addLight(){
-
-        requestAnimationFrame(this.addLight.bind(this));
-    //  var lights = [];
-      // lights[0] = new THREE.DirectionalLight( 0xffffff, 1 );
-      //  lights[0].position.set( 1, 0, 0 );
-      //  lights[1] = new THREE.DirectionalLight( 0x70a6ff, 1 );
-      //  lights[1].position.set( 0.75, 1, 0.5 );
-      //  lights[2] = new THREE.DirectionalLight( 0xf46f4e, 1 );
-      //  lights[2].position.set( -0.75, -1, 0.5 );
-      //  this.scene.add( lights[0] );
-      //  this.scene.add( lights[1] );
-      //  this.scene.add( lights[2] );
-      }
-
     render(){
         requestAnimationFrame(this.render.bind(this));
-        for (let i=0; i<(this.scene.children.length)-1; i++) {
+        for (let i=0; i<(this.scene.children.length)-this.segregation; i++) {
             //Choose Shape to render
-            this[this.shape](this.particlesStored[i],i, this.frequencyData[i]);
+            this[this.shape[2]](this.particlesStored[i],i, this.frequencyData[i]);
         }
         //Render
+        //console.log(this.scene.children.length);
         this.renderer.render( this.scene, this.camera );
     }
 
@@ -104,15 +93,28 @@ class Visualization{
         this.renderer.setSize(this.windowWidth, this.windowHeight);
     }
 
+    addLight(){
+      var lights = [];
+      lights[0] = new THREE.DirectionalLight( 0xffffff, 1 );
+      lights[0].position.set( 1, 0, 0 );
+      lights[1] = new THREE.DirectionalLight( 0xffffff, 1 );
+      lights[1].position.set( 0.75, 1, 0.5 );
+      lights[2] = new THREE.DirectionalLight( 0xffffff, 1 );
+      lights[2].position.set( -0.75, -1, 0.5 );
+      this.scene.add( lights[0] );
+      this.segregation++
+      this.scene.add( lights[1] );
+      this.segregation++
+      this.scene.add( lights[2] );
+    }
+
     addParticles(){
         let particle,i;
-        var light1 = new THREE.AmbientLight(0xffffff, 0.5);
-        this.scene.add(light1);
         for (i = 0; i < this.particles; i++) {
 						this.box = new THREE.BoxGeometry(3, 3, 3);
-						this.boxMat = new THREE.MeshPhongMaterial({
+						this.boxMat = new THREE.MeshLambertMaterial({
              color:0x93bcff,
-              emissive:0x93bcff
+             
             });
            particle  = new THREE.Mesh(this.box, this.boxMat);
 
@@ -121,47 +123,44 @@ class Visualization{
         }
     }
 
-
-	//ring(part, index,frequency){
-  //  var v = (index + 1000 + frequency * 0.5) * 0.05;
-  //  part.position.x += ((Math.sin(index * 100) * v) - part.position.x) * this.ease;
-  //  part.position.y += ((Math.cos(index * 100) * v) - part.position.y) * this.ease;
-  //  part.position.z += ((frequency * this.ease * 4) - part.position.z) * this.ease;
-
-  //  }
-
     // These are different shapes that can be used when creating the layout of the particals
-    //Change value of this.shape and remove comment(s) to try shape.
+    //Change value of this.shape
+
+	ring(part, index,frequency){
+    var v = (index + 1000 + frequency * 0.5) * 0.05;
+   part.position.x += ((Math.sin(index * 100) * v) - part.position.x) * this.ease;
+   part.position.y += ((Math.cos(index * 100) * v) - part.position.y) * this.ease;
+   part.position.z += ((frequency * this.ease * 2) - part.position.z) * this.ease;
+    }
 
     //Line
-    // line(part,index,frequency){
-    //     let sqrt = Math.sqrt(this.scene.children.length);
-    //     part.position.x += ((index % sqrt) * 10 - sqrt)  - part.position.x;
-    //     part.position.y += ((Math.floor(index /1000) * 10 - sqrt) - part.position.y);
-    //     part.position.z += ((frequency * 0.5) - part.position.z) * this.ease;
-    // }
+    line(part,index,frequency){
+        let sqrt = Math.sqrt(this.scene.children.length);
+      part.position.x += ((index % sqrt) * 10 - sqrt)  - part.position.x;
+      part.position.y += ((Math.floor(index /1000) * 10 - sqrt) - part.position.y);
+      part.position.z += ((frequency * 0.5) - part.position.z) * this.ease;
+     }
 
     //Speaker
-    // speaker(part, index,frequency){
-    //       var v = (index + 100 + frequency * 0.5) * 0.2;
-    //       part.position.x += ((Math.sin(index * -0.2) * v) - part.position.x) * this.ease;
-    //       part.position.y += ((Math.cos(index * -0.2) * v) - part.position.y) * this.ease;
-    //       part.position.z += ((frequency * this.ease * 3.5) - part.position.z) * this.ease;
-    //
-    //   }
+  speaker(part, index,frequency){
+        var v = (index + 100 + frequency * 0.5) * 0.2;
+      part.position.x += ((Math.sin(index * -0.2) * v) - part.position.x) * this.ease;
+      part.position.y += ((Math.cos(index * -0.2) * v) - part.position.y) * this.ease;
+      part.position.z += ((frequency * this.ease * 3.5) - part.position.z) * this.ease;
+      }
 
     //Clam
      clam(c,index,frequency){
        var v = (index + 100 + frequency * 0.5) * 0.2;
       c.position.x += ((Math.sin(index * 100) * v) - c.position.x) * this.ease;
       c.position.y += ((Math.cos(index * 100) * v) - c.position.y) * this.ease;
-      c.position.z += ((frequency * this.ease * 3.5) - c.position.z) * this.ease;
+      c.position.z += ((frequency * this.ease * 3) - c.position.z) * this.ease;
       }
 
 }
 
 //On load run class
 $(function(){
-    var animate = new Visualization({particles: 150, ease: 0.08});
+    var animate = new Visualization({particles: 150, ease: 0.15});
     animate.init();
 });
