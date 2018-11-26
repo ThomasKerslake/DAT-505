@@ -17,14 +17,14 @@ class Visualization{
         this.camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 5000 );
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setClearColor( 0x000000, 0 );
-        this.renderer.shadowMap.enabled = true;
-				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.camera.position.set(0, -95, 50);
         this.windowHeight = $(window).height();
         this.windowWidth = $(window).width();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.autoClear = false;
         this.renderer.setClearColor(0x000000, 0.0);
+        this.renderer.shadowMap.enabled = true;
+				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.index = 0;
         this.shape = ['clam','speaker','ring','line'];
         this.octahedron = ['oct1']
@@ -37,10 +37,11 @@ class Visualization{
 
         this.render();
         this.addParticles();
-        this.addLight();
+        //this.addLight();
+        this.addAmbientLight();
         this.addCenter();
         this.addPlane();
-        //this.addSpotLight();
+        this.addSpotLight();
 
         //Add listeners
         $(window).on('resize', this.resize.bind(this));
@@ -100,7 +101,7 @@ class Visualization{
         this.renderer.setSize(this.windowWidth, this.windowHeight);
     }
 
-    addLight(){
+    /*addLight(){
       var lights = [];
       lights[0] = new THREE.DirectionalLight( 0xffffff, 1 );
       lights[0].position.set( 1, 0, 0 );
@@ -113,24 +114,30 @@ class Visualization{
       this.scene.add( lights[1] );
       this.segregation++
       this.scene.add( lights[2] );
+    }*/
+
+    addAmbientLight(){
+      let ambLight
+      ambLight = new THREE.AmbientLight( 0xc4c4c4 ); // soft white light
+      this.scene.add(ambLight);
     }
 
-    // addSpotLight(){
-    //   var spotLight = new THREE.SpotLight( 0xffffff );
-    //   spotLight.position.set( 0, 0, 100 );
-    //
-    //   spotLight.castShadow = true;
-    //
-    //   spotLight.shadow.mapSize.width = 1024;
-    //   spotLight.shadow.mapSize.height = 1024;
-    //
-    //   spotLight.shadow.camera.near = 100;
-    //   spotLight.shadow.camera.far = 2000;
-    //   spotLight.shadow.camera.fov = 90;
-    //
-    //   this.scene.add( spotLight );
-    //   this.segregation++
-    // }
+    addSpotLight(){
+      var spotLight = new THREE.SpotLight( 0xc4c4c4 );
+      spotLight.position.set( 0, 0, 150 );
+
+      spotLight.castShadow = true;
+
+      spotLight.shadow.mapSize.width = 1024;
+      spotLight.shadow.mapSize.height = 1024;
+
+      spotLight.shadow.camera.near = 10;
+      spotLight.shadow.camera.far = 1000;
+      spotLight.shadow.camera.fov = 90;
+
+       this.scene.add( spotLight );
+       this.segregation++
+     }
 
     addCenter(){
       let myObj;
@@ -139,7 +146,7 @@ class Visualization{
        color:0x8c1dd1,
       });
      myObj = new THREE.Mesh(this.centerObj, this.centerObjMat);
-     myObj.position.z = 10;
+     myObj.position.z = 30;
      myObj.castShadow = true;
      this.scene.add(myObj);
      this.myObj.push(myObj);
@@ -148,11 +155,10 @@ class Visualization{
 
     addPlane(){
       let myPlane;
-      this.planeGeo = new THREE.PlaneGeometry(250, 250, 32);
-      this.planeMat = new THREE.MeshBasicMaterial( {color: 0xff5858, side: THREE.DoubleSide} );
+      this.planeGeo = new THREE.PlaneGeometry(350, 350, 32);
+      this.planeMat = new THREE.MeshLambertMaterial( {color: 0xff5858, side: THREE.FrontSide} );
       myPlane = new THREE.Mesh( this.planeGeo, this.planeMat );
       myPlane.receiveShadow = true;
-      myPlane.rotation.x = 0;
       myPlane.position.z = -10;
       this.scene.add(myPlane);
       this.segregation++
