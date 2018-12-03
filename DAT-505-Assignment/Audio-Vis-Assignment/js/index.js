@@ -110,7 +110,7 @@ class Visualization{
 
     addAmbientLight(){
       let ambLight
-      ambLight = new THREE.AmbientLight( 0xc4c4c4 ); // soft white light
+      ambLight = new THREE.AmbientLight( 0xc4c4c4 );
       this.scene.add(ambLight);
     }
 
@@ -239,9 +239,9 @@ class Visualization{
     //Change value of this.shape
 
 	ring(part, index, frequency){
-    var v = (index + 1000 + frequency * 0.5) * 0.05;
-   part.position.x += ((Math.sin(index * 100) * v) - part.position.x) * this.ease;
-   part.position.y += ((Math.cos(index * 100) * v) - part.position.y) * this.ease;
+    var q = (index + 1000 + frequency * 0.5) * 0.05;
+   part.position.x += ((Math.sin(index * 100) * q) - part.position.x) * this.ease;
+   part.position.y += ((Math.cos(index * 100) * q) - part.position.y) * this.ease;
    part.position.z += ((frequency * this.ease * 2) - part.position.z) * this.ease;
    part.rotation.z -= 0.02;
     }
