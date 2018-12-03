@@ -132,7 +132,7 @@ class Visualization{
       let myObj;
       this.centerObj = new THREE.OctahedronGeometry(13,0);
       this.centerObjMat = new THREE.MeshLambertMaterial({
-       color:0x8c1dd1,
+       color:0x4286f4,
       });
      myObj = new THREE.Mesh(this.centerObj, this.centerObjMat);
      myObj.position.z = 35;
@@ -146,7 +146,7 @@ class Visualization{
       let myChildObj1, myChildObj2, myChildObj3, myChildObj4, myChildObj5;
       this.childObj = new THREE.OctahedronGeometry(7,0);
       this.childObjMat = new THREE.MeshLambertMaterial({
-       color:0x8c1dd1,
+       color:0x4286f4,
       });
      myChildObj1 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj1.position.z = 20;
@@ -194,7 +194,7 @@ class Visualization{
     addPlane(){
       let myPlane;
       this.planeGeo = new THREE.PlaneGeometry(300, 300, 32);
-      this.planeMat = new THREE.MeshLambertMaterial( {color: 0xff5858, side: THREE.FrontSide} );
+      this.planeMat = new THREE.MeshLambertMaterial( {color: 0xf4ae00 , side: THREE.FrontSide} );
       myPlane = new THREE.Mesh( this.planeGeo, this.planeMat );
       myPlane.receiveShadow = true;
       myPlane.position.z = -10;
@@ -207,7 +207,7 @@ class Visualization{
         for (i = 0; i < this.particles; i++) {
 						this.box = new THREE.BoxGeometry(3, 3, 3);
 						this.boxMat = new THREE.MeshLambertMaterial({
-             color:0x8c1dd1,
+             color:0x4286f4,
             });
            particle  = new THREE.Mesh(this.box, this.boxMat);
            particle.castShadow = true;
@@ -240,7 +240,7 @@ class Visualization{
     //Change value of this.shape
 
 	ring(part, index, frequency){
-    var q = (index + 1000 + frequency * 0.5) * 0.05;
+    var q = (index + 1100 + frequency * 0.5) * 0.05;
    part.position.x += ((Math.sin(index * 100) * q) - part.position.x) * this.ease;
    part.position.y += ((Math.cos(index * 100) * q) - part.position.y) * this.ease;
    part.position.z += ((frequency * this.ease * 2) - part.position.z) * this.ease;
