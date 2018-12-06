@@ -6,6 +6,7 @@ class Visualization{
         this.ease = options.ease;
         //Particle storage
         this.particlesStored = [];
+        this.particlesStored2 = [];
         //Stores new objs
         this.myObj = [];
         //The starting value of scences that need to be subtracted from length of scene.children.length
@@ -29,7 +30,7 @@ class Visualization{
         this.renderer.shadowMap.enabled = true;
 				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.index = 0;
-        this.shape = ['ring'];
+        this.shape = ['ring', 'ring2'];
         this.octahedron = ['oct1','octc'];
 
         //Setting up the Orbit Controls
@@ -40,6 +41,7 @@ class Visualization{
 
         this.render();
         this.addParticles();
+        this.addParticles2();
         this.addAmbientLight();
         this.addCenter();
         this.addPlane();
@@ -90,6 +92,7 @@ class Visualization{
         for (let i=0; i<(this.scene.children.length)-this.segregation; i++) {
             //Choose Shape to render
             this[this.shape[0]](this.particlesStored[i],i, this.frequencyData[i]);
+            this[this.shape[1]](this.particlesStored2[i],i, this.frequencyData[i]);
             this[this.octahedron[0]](this.myObj[0]);
             this[this.octahedron[1]](this.myObj[1],this.frequencyData[i]);//this.frequencyData[i]
             this[this.octahedron[1]](this.myObj[2],this.frequencyData[i]);
@@ -150,7 +153,7 @@ class Visualization{
       });
      myChildObj1 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj1.position.z = 20;
-     myChildObj1.position.y = 30;
+     myChildObj1.position.y = 30 + 20;
      myChildObj1.castShadow = true;
      this.scene.add(myChildObj1);
      this.myObj.push(myChildObj1);
@@ -158,7 +161,7 @@ class Visualization{
 
      myChildObj2 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj2.position.z = 20;
-     myChildObj2.position.x = -30;
+     myChildObj2.position.x = -30 + - 20;
      myChildObj2.castShadow = true;
      this.scene.add(myChildObj2);
      this.myObj.push(myChildObj2);
@@ -166,7 +169,7 @@ class Visualization{
 
      myChildObj3 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj3.position.z = 20;
-     myChildObj3.position.x = 30;
+     myChildObj3.position.x = 30 + 20;
      myChildObj3.castShadow = true;
      this.scene.add(myChildObj3);
      this.myObj.push(myChildObj3);
@@ -174,7 +177,7 @@ class Visualization{
 
      myChildObj4 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj4.position.z = 20;
-     myChildObj4.position.y = -30;
+     myChildObj4.position.y = -30 - 20;
      myChildObj4.castShadow = true;
      this.scene.add(myChildObj4);
      this.myObj.push(myChildObj4);
@@ -205,16 +208,35 @@ class Visualization{
     addParticles(){
         let particle,i;
         for (i = 0; i < this.particles; i++) {
-						this.box = new THREE.BoxGeometry(3, 3, 3);
+						this.box = new THREE.CylinderGeometry( 2, 2, 100, 32 );
 						this.boxMat = new THREE.MeshLambertMaterial({
-             color:0x4286f4,
+             color:0x4286f4
             });
            particle  = new THREE.Mesh(this.box, this.boxMat);
+           particle.rotation.x = 1.6;
            particle.castShadow = true;
             this.scene.add(particle);
             this.particlesStored.push(particle);
         }
     }
+
+    addParticles2(){
+        let particle2,i;
+        for (i = 0; i < this.particles; i++) {
+						this.box2 = new THREE.CylinderGeometry( 2, 2, 100, 32 );
+						this.boxMat2 = new THREE.MeshLambertMaterial({
+             color:0x4286f4
+            });
+           particle2  = new THREE.Mesh(this.box2, this.boxMat2);
+           particle2.rotation.x = 1.6;
+           particle2.castShadow = true;
+            this.scene.add(particle2);
+            this.particlesStored2.push(particle2);
+            this.segregation++;
+        }
+    }
+
+
 
 
     oct1(part){
@@ -240,16 +262,24 @@ class Visualization{
     //Change value of this.shape
 
 	ring(part, index, frequency){
-    var q = (index + 1100 + frequency * 0.5) * 0.05;
+    var q = (index + 200 + frequency * 0.5) * 0.05;
    part.position.x += ((Math.sin(index * 100) * q) - part.position.x) * this.ease;
    part.position.y += ((Math.cos(index * 100) * q) - part.position.y) * this.ease;
-   part.position.z += ((frequency * this.ease * 2) - part.position.z) * this.ease;
-   part.rotation.z -= 0.02;
+   part.position.z += (- 50 + (frequency * this.ease * 2) - part.position.z) * this.ease;
+   //part.rotation.z -= 0.02;
     }
+
+    ring2(part, index, frequency){
+      var q = (index + 500 + frequency * 0.5) * 0.05;
+     part.position.x += ((Math.sin(index * 100) * q) - part.position.x) * this.ease;
+     part.position.y += ((Math.cos(index * 100) * q) - part.position.y) * this.ease;
+     part.position.z += (- 50 + (frequency * this.ease * 1) - part.position.z) * this.ease;
+     //part.rotation.z -= 0.02;
+      }
 }
 
 //On load run class
 window.onload = ()=>{
-    var animate = new Visualization({particles: 150, ease: 0.15});
+    var animate = new Visualization({particles: 12, ease: 0.15});
     animate.init();
 };
