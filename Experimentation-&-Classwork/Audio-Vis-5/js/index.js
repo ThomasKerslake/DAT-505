@@ -19,14 +19,17 @@ class Visualization{
 //Start of the Init
     init(){
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 5000 );
+        this.windowHeight = window.innerHeight;
+        this.windowWidth = window.innerWidth;
+        this.camera = new THREE.PerspectiveCamera( 90, this.windowWidth / this.windowHeight, 0.1, 5000 );
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setClearColor( 0x000000, 0 );
         this.renderer.setClearColor(0x000000, 0.0);
+        this.composer = new THREE.EffectComposer( this.renderer );
+        this.composer.addPass( new THREE.RenderPass( this.scene, this.camera ) );
         this.camera.position.set(0, -95, 30);
-        this.windowHeight = window.innerHeight;
-        this.windowWidth = window.innerWidth;
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(this.windowWidth, this.windowHeight);
+        this.composer.setSize(this.windowWidth, this.windowHeight);
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
 				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -41,6 +44,7 @@ class Visualization{
         document.body.appendChild(this.renderer.domElement);
 
         this.render();
+        this.addPostProcessing();
         this.addParticles();
         this.addParticles2();
         this.addAmbientLight();
@@ -99,7 +103,21 @@ class Visualization{
             this[this.octahedron[1]](this.myObj[3],this.frequencyData[i]);
 
         }
-        this.renderer.render( this.scene, this.camera );
+        this.composer.render();
+    }
+
+    addPostProcessing(){
+    var taaRenderPass = new THREE.TAARenderPass( this.scene, this.camera );
+		taaRenderPass.unbiased = false;
+    taaRenderPass.sampleLevel = 2;
+		this.composer.addPass( taaRenderPass );
+    var smaaPass = new THREE.SMAAPass( window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio() );
+		smaaPass.renderToScreen = true;
+		this.composer.addPass( smaaPass );
+    var effect2 = new THREE.ShaderPass( THREE.RGBShiftShader );
+    effect2.uniforms[ 'amount' ].value = 0;
+    effect2.renderToScreen = true;
+    this.composer.addPass( effect2 );
     }
 
     resize(){
@@ -108,6 +126,7 @@ class Visualization{
         this.camera.aspect = this.windowWidth / this.windowHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.windowWidth, this.windowHeight);
+        this.composer.setSize(this.windowWidth, this.windowHeight);
     }
 
     addAmbientLight(){
