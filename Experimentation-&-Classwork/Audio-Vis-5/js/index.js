@@ -107,17 +107,27 @@ class Visualization{
     }
 
     addPostProcessing(){
+
+    var afterimagePass = new THREE.AfterimagePass();
+    afterimagePass.uniforms['damp'].value = 0.98;
+  	afterimagePass.renderToScreen = true;
+  	this.composer.addPass( afterimagePass );
+
     var taaRenderPass = new THREE.TAARenderPass( this.scene, this.camera );
 		taaRenderPass.unbiased = false;
     taaRenderPass.sampleLevel = 2;
 		this.composer.addPass( taaRenderPass );
+
     var smaaPass = new THREE.SMAAPass( window.innerWidth * this.renderer.getPixelRatio(), window.innerHeight * this.renderer.getPixelRatio() );
 		smaaPass.renderToScreen = true;
 		this.composer.addPass( smaaPass );
+
     var effect2 = new THREE.ShaderPass( THREE.RGBShiftShader );
     effect2.uniforms[ 'amount' ].value = 0;
     effect2.renderToScreen = true;
     this.composer.addPass( effect2 );
+
+// Taa and smaaa shader pass test, after image does not work with SMAA and effect2
     }
 
     resize(){
@@ -154,7 +164,7 @@ class Visualization{
       let myChildObj1, myChildObj2, myChildObj3, myChildObj4, myChildObj5;
       this.childObj = new THREE.OctahedronGeometry(7,0);
       this.childObjMat = new THREE.MeshLambertMaterial({
-       color:0xffffff,
+       color:0x42f498,
       });
      myChildObj1 = new THREE.Mesh(this.childObj, this.childObjMat);
      myChildObj1.position.z = 20;
@@ -209,7 +219,7 @@ class Visualization{
         for (i = 0; i < this.particles; i++) {
 						this.box = new THREE.BoxGeometry( 3 , 100, 3);
 						this.boxMat = new THREE.MeshLambertMaterial({
-             color:0xffffff
+             color:0x42f498
             });
            particle  = new THREE.Mesh(this.box, this.boxMat);
            particle.rotation.x = 1.6; //1.6
@@ -224,7 +234,7 @@ class Visualization{
         for (i = 0; i < this.particles; i++) {
 						this.box2 = new THREE.BoxGeometry( 3, 100, 3);
 						this.boxMat2 = new THREE.MeshLambertMaterial({
-             color:0xffffff
+             color:0x42f498
             });
            particle2  = new THREE.Mesh(this.box2, this.boxMat2);
            particle2.rotation.x = 1.6;

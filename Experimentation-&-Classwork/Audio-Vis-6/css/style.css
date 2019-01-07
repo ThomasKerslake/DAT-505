@@ -1,0 +1,50 @@
+html{
+	/*background-image: linear-gradient(-60deg, #ff5858 0%, #f09819 100%);*/
+	background-color: #000000; /*#fedf32;*/   /*#ff6e6e;*/     /*#ff5858*/
+}
+
+body {
+	margin: 0;
+	overflow: hidden;
+}
+
+label{
+	color: #FFF;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: Arial;
+	font-size: 28px;
+}
+
+input{
+    position: fixed;
+    top: 0;
+    bottom:0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    width: 100%;
+    opacity: 0;
+		cursor: pointer;
+}
+
+audio{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 30%;
+    height: 40px;
+		opacity: 0;
+		-webkit-transition: opacity 1s;
+	  transition: opacity 1s;
+    z-index: 1;
+}
+
+audio:hover{
+	opacity: 1;
+	-webkit-transition: opacity 1s;
+  transition: opacity 1s;
+}
