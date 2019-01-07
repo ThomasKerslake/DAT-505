@@ -37,6 +37,7 @@ class Visualization{
         this.index = 0;
         this.shape = ['ring1', 'ring2', 'line', 'ring3'];
         this.octahedron = ['oct1','octc'];
+        this.gui = new dat.GUI( { name: 'MyGui' } );
 
         //Setting up the Orbit Controls
         this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
@@ -107,6 +108,8 @@ class Visualization{
         this.composer.render();
     }
 
+
+
     addPostProcessing(){
 
     var afterimagePass = new THREE.AfterimagePass();
@@ -118,6 +121,8 @@ class Visualization{
 		taaRenderPass.unbiased = false;
     taaRenderPass.sampleLevel = 2;
 		this.composer.addPass( taaRenderPass );
+
+    this.gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
 
 // Taa and smaaa shader pass test, after image does not work with SMAA and effect2
     }
