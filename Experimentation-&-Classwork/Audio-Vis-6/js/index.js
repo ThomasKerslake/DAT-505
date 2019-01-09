@@ -1,3 +1,5 @@
+var myAudioContext, myAudio, highQual, lowQual;
+var scale = 1;
 
 class Visualization{
     constructor(options){
@@ -60,24 +62,34 @@ class Visualization{
         //Add listeners
         window.addEventListener( 'resize', this.resize.bind(this));
         document.getElementById("file").addEventListener('change', this.onFileSelect.bind(this));
+        document.getElementById("file").addEventListener('change', function(){
+          var help = document.getElementById('mybtn');
+          help.style.display = "block";
+          setTimeout(function(){help.remove();}, 5000);
+        });
+
 
 			//End of INIT -----------------------------------------------------------
     }
 
     initAudio(){
         //Init Audio
-        this.audioObj = new Audio();
+        myAudio = new Audio()
+        this.audioObj = myAudio;
         this.audioObj.controls = true;
         document.body.appendChild(this.audioObj);
 
         //Init context/analyser
-        this.audioContext = new AudioContext();
+        myAudioContext = new AudioContext();
+        this.audioContext = myAudioContext;
         this.source = this.audioContext.createMediaElementSource(this.audioObj);
         this.analyser = this.audioContext.createAnalyser();
         this.source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
         this.bufferLength = this.analyser.frequencyBinCount;
         this.frequencyData = new Uint8Array(this.bufferLength);
+
+
     }
 
     analyseAudio(){
@@ -108,23 +120,20 @@ class Visualization{
         this.composer.render();
     }
 
-
-
     addPostProcessing(){
 
     var afterimagePass = new THREE.AfterimagePass();
     afterimagePass.uniforms['damp'].value = 0.98;
   	afterimagePass.renderToScreen = true;
   	this.composer.addPass( afterimagePass );
+    this.gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
 
     var taaRenderPass = new THREE.TAARenderPass( this.scene, this.camera );
 		taaRenderPass.unbiased = false;
     taaRenderPass.sampleLevel = 2;
 		this.composer.addPass( taaRenderPass );
 
-    this.gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-
-// Taa and smaaa shader pass test, after image does not work with SMAA and effect2
+    // Taa and smaaa shader pass do not work with AfterimagePass
     }
 
     resize(){
@@ -159,13 +168,15 @@ class Visualization{
 
     addCenterChildren(){
       let myChildObj1;
+      let rotationX = 1.58;
       this.childObj = new THREE.OctahedronGeometry(7,0);
       this.childObjMat = new THREE.MeshLambertMaterial({
        color:0x000000,
       });
       myChildObj1 = new THREE.Mesh(this.childObj, this.childObjMat);
-      myChildObj1.castShadow = true;
-      myChildObj1.rotation.x =1.67;
+      //myChildObj1.castShadow = true;
+      myChildObj1.rotation.x = rotationX;
+      this.gui.add( myChildObj1.rotation, 'x', 0, 1 ).step( 0.001 );
       this.scene.add(myChildObj1);
       this.myObj.push(myChildObj1);
       this.segregation++
@@ -190,10 +201,17 @@ class Visualization{
              color:0x23ffff
             });
            particle1  = new THREE.Mesh(this.box, this.boxMat);
-           particle1.castShadow = true;
+           //particle1.castShadow = true;
+           particle1.scale.x = scale;
+           particle1.scale.y = scale;
+           particle1.scale.z = scale;
             this.scene.add(particle1);
             this.particlesStored1.push(particle1);
         }
+        this.gui.add( particle1.scale, 'x', 1, 4 ).step( 1 );
+        this.gui.add( particle1.scale, 'y', 1, 4 ).step( 1 );
+        this.gui.add( particle1.scale, 'z', 1, 4 ).step( 1 );
+
     }
 
     addParticlesSet2(){
@@ -206,7 +224,7 @@ class Visualization{
             });
            particle2  = new THREE.Mesh(this.box2, this.boxMat2);
            //particle2.rotation.x = 1.6
-           particle2.castShadow = true;
+           //particle2.castShadow = true;
             this.scene.add(particle2);
             this.particlesStored2.push(particle2);
             this.segregation++;
@@ -222,7 +240,7 @@ class Visualization{
             });
            particle3  = new THREE.Mesh(this.box3, this.boxMat3);
            //particle2.rotation.x = 1.6
-           particle3.castShadow = true;
+           //particle3.castShadow = true;
             this.scene.add(particle3);
             this.particlesStored3.push(particle3);
             this.segregation++;
@@ -238,7 +256,7 @@ class Visualization{
                 });
                particle4  = new THREE.Mesh(this.box4, this.boxMat4);
                //particle2.rotation.x = 1.6
-               particle4.castShadow = true;
+               //particle4.castShadow = true;
                 this.scene.add(particle4);
                 this.particlesStored4.push(particle4);
                 this.segregation++;
@@ -256,7 +274,7 @@ class Visualization{
 
     octc(part, frequency){
       part.position.z += ((frequency * this.ease * 1) - part.position.z) * this.ease;
-      part.rotation.z += (frequency * this.ease * 0.00003) * this.ease;
+      //part.rotation.z += (frequency * this.ease * 0.00003) * this.ease;
       part.scale.z = 15;
       part.scale.x = 11;
       part.scale.y = 11;
@@ -278,6 +296,7 @@ class Visualization{
      part.position.z += ((frequency * this.ease * 0.1) - part.position.z) * this.ease;
      part.position.x += Math.sin(frequency / 15) * 20; //100
      part.position.y += Math.cos(frequency / 15) * 20; // 100
+     part.position.z -= Math.cos(frequency / 15) * 20; // 100**
      //part.position.z -= Math.sin(frequency / 15) * 20; // 100
      part.material.color.offsetHSL((frequency/2000) / 512, 0.1, 0);
       }
@@ -300,6 +319,7 @@ class Visualization{
          part.position.z += ((frequency * this.ease * 0.1) - part.position.z) * this.ease;
          part.position.x -= Math.sin(frequency / 15) * 20; //100
          part.position.y -= Math.cos(frequency / 15) * 20; // 100
+         part.position.z -= Math.cos(frequency / 15) * 20; // 100**
          //part.position.z -= Math.sin(frequency / 15) * 20; // 100
          part.material.color.offsetHSL((frequency/2000) / 512, 0.1, 0);
           }
@@ -344,7 +364,27 @@ class Visualization{
 }
 
 //On load run class
-window.onload = ()=>{
-    var animate = new Visualization({particles: 60, ease: 0.1});
-    animate.init();
-};
+
+highQual = document.getElementById("High");
+lowQual = document.getElementById("Low");
+
+highQual.addEventListener('click', function(){
+  document.getElementById("overlay").style.display = "none";
+  var animate = new Visualization({particles: 60, ease: 0.1});
+  animate.init();
+});
+
+lowQual.addEventListener('click', function(){
+  document.getElementById("overlay").style.display = "none";
+  var animate = new Visualization({particles: 30, ease: 0.1});
+  animate.init();
+});
+
+
+
+document.getElementById('mybtn').addEventListener('click', function() {
+  myAudioContext.resume().then(() => {
+    console.log('Playback resumed successfully');
+    document.getElementById("mybtn").outerHTML = "";
+  });
+});
