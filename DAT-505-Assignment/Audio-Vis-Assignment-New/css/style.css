@@ -29,19 +29,6 @@ label{
 	font-size: 28px;
 }
 
-input{
-		margin: 0;
-		padding: 0;
-    position: fixed;
-    top: 0;
-    bottom:0;
-    left: 0;
-    right: 0;
-    z-index: 9;
-    width: 100%;
-    opacity: 0;
-		cursor: pointer;
-}
 
 #file{
     position: fixed;
@@ -96,29 +83,52 @@ audio:hover{
   height: 100%; /* Full height (cover the whole page) */
   background-color: black; /* Black background with opacity */
   z-index: 3; /* Specify a stack order in case you're using a different order for other elements */
-  cursor: pointer; /* Add a pointer on hover */
 }
 
 #High{
-	color: #FFF;
+	color: #c4c4c4;
 	position: fixed;
-	top: 53%;
+	top: 40%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-family: Arial;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 25px;
+	cursor: pointer;
+}
+
+#Med{
+	color: #c4c4c4;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 25px;
 	cursor: pointer;
 }
 
 #Low{
-	color: #FFF;
+	color: #c4c4c4;
 	position: fixed;
-	top: 56%;
+	top: 60%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 	font-family: Arial;
 	font-weight: bold;
-	font-size: 15px;
+	font-size: 25px;
 	cursor: pointer;
+}
+
+#Low:hover{
+	color: #FFFFFF;
+}
+
+#Med:hover{
+	color: #FFFFFF;
+}
+
+#High:hover{
+	color: #FFFFFF;
 }

@@ -1,5 +1,4 @@
-var myAudioContext, myAudio, highQual, lowQual;
-var scale = 1;
+var myAudioContext, myAudio, highQual, lowQual, medQual;
 
 class Visualization{
     constructor(options){
@@ -27,7 +26,6 @@ class Visualization{
         this.camera = new THREE.PerspectiveCamera( 50, this.windowWidth / this.windowHeight, 0.1, 5000 );
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setClearColor( 0x000000, 0 );
-        this.renderer.setClearColor(0x000000, 0.0);
         this.composer = new THREE.EffectComposer( this.renderer );
         this.composer.addPass( new THREE.RenderPass( this.scene, this.camera ) );
         this.camera.position.set(0, -100, 1000);
@@ -88,8 +86,6 @@ class Visualization{
         this.analyser.connect(this.audioContext.destination);
         this.bufferLength = this.analyser.frequencyBinCount;
         this.frequencyData = new Uint8Array(this.bufferLength);
-
-
     }
 
     analyseAudio(){
@@ -127,11 +123,6 @@ class Visualization{
   	afterimagePass.renderToScreen = true;
   	this.composer.addPass( afterimagePass );
     this.gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-
-    var taaRenderPass = new THREE.TAARenderPass( this.scene, this.camera );
-		taaRenderPass.unbiased = false;
-    taaRenderPass.sampleLevel = 2;
-		this.composer.addPass( taaRenderPass );
 
     // Taa and smaaa shader pass do not work with AfterimagePass
     }
@@ -196,22 +187,15 @@ class Visualization{
     addParticlesSet1(){
         let particle1,i;
         for (i = 0; i < this.particles; i++) {
-						this.box = new THREE.SphereGeometry( 2, 32, 32 );
+						this.box = new THREE.SphereGeometry(2, 32, 32 );
 						this.boxMat = new THREE.MeshLambertMaterial({
              color:0x23ffff
             });
            particle1  = new THREE.Mesh(this.box, this.boxMat);
            //particle1.castShadow = true;
-           particle1.scale.x = scale;
-           particle1.scale.y = scale;
-           particle1.scale.z = scale;
             this.scene.add(particle1);
             this.particlesStored1.push(particle1);
         }
-        this.gui.add( particle1.scale, 'x', 1, 4 ).step( 1 );
-        this.gui.add( particle1.scale, 'y', 1, 4 ).step( 1 );
-        this.gui.add( particle1.scale, 'z', 1, 4 ).step( 1 );
-
     }
 
     addParticlesSet2(){
@@ -336,41 +320,23 @@ class Visualization{
         part.material.color.offsetHSL((frequency/2000) / 512, 0.1, 0);
         }
 
-
-
-
-
-    //   let sqrt = Math.sqrt(this.scene.children.length);
-    // part.position.x += ((index % sqrt * 10) * sqrt - 1000)  - part.position.x;
-    // part.position.y += ((Math.floor(index /100) * 10 - sqrt) - part.position.y);
-    // part.scale.y += ((frequency * this.ease * 1) - part.scale.y) * 0.02;
-    // part.scale.x += ((frequency * this.ease * 1) - part.scale.x) * 0.02;
-    // part.scale.z += ((frequency * this.ease * 1) - part.scale.z) * 0.02;
-    // part.rotation.y += ((frequency * this.ease * 1) - part.rotation.y) * 0.02;
-    // //part.position.y = -500;
-    // part.position.x += Math.sin(frequency / 200) * 20; //100
-    // part.position.y += Math.cos(frequency / 200) * 20;
-    // part.material.color.offsetHSL((frequency/100) / 512, 0.1, 0);
-
-      // ring2(part, index, frequency){
-      //   var q = (index + 1000 + frequency * 0.5) * 0.04;
-      //  part.position.x += ((Math.sin(index * 100) * q) - part.position.x) * this.ease;
-      //  part.position.y += ((Math.cos(index * 100) * q) - part.position.y) * this.ease;
-      //  //part.position.z += ((frequency * this.ease * 2) - part.position.z) * this.ease;
-      //  part.scale.y += ((frequency * this.ease * 2) - part.scale.y) * this.ease;
-      //  part.rotation.z = 1 ;
-      //   }
-
 }
 
 //On load run class
 
 highQual = document.getElementById("High");
+medQual = document.getElementById("Med");
 lowQual = document.getElementById("Low");
 
 highQual.addEventListener('click', function(){
   document.getElementById("overlay").style.display = "none";
   var animate = new Visualization({particles: 60, ease: 0.1});
+  animate.init();
+});
+
+medQual.addEventListener('click', function(){
+  document.getElementById("overlay").style.display = "none";
+  var animate = new Visualization({particles: 45, ease: 0.1});
   animate.init();
 });
 

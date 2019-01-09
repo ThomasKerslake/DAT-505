@@ -1,5 +1,4 @@
 var myAudioContext, myAudio, highQual, lowQual;
-var scale = 1;
 
 class Visualization{
     constructor(options){
@@ -196,22 +195,15 @@ class Visualization{
     addParticlesSet1(){
         let particle1,i;
         for (i = 0; i < this.particles; i++) {
-						this.box = new THREE.SphereGeometry( 2, 32, 32 );
+						this.box = new THREE.SphereGeometry(2, 32, 32 );
 						this.boxMat = new THREE.MeshLambertMaterial({
              color:0x23ffff
             });
            particle1  = new THREE.Mesh(this.box, this.boxMat);
            //particle1.castShadow = true;
-           particle1.scale.x = scale;
-           particle1.scale.y = scale;
-           particle1.scale.z = scale;
             this.scene.add(particle1);
             this.particlesStored1.push(particle1);
         }
-        this.gui.add( particle1.scale, 'x', 1, 4 ).step( 1 );
-        this.gui.add( particle1.scale, 'y', 1, 4 ).step( 1 );
-        this.gui.add( particle1.scale, 'z', 1, 4 ).step( 1 );
-
     }
 
     addParticlesSet2(){
