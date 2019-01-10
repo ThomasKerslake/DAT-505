@@ -18,7 +18,7 @@ the screen to select a file from their system. I have included some
 music to test within my project (located in folder -> music).
 
 *******************************************************************************************
-Songs 1 and 2 are the best for this visualization as I have stlyed this project around them.
+Songs 4 and 1 are the best for this visualization as I have stlyed this project around them.
 *******************************************************************************************
 
 If the visualization is not playing there is a ‘fall-back’ button you can click at 
