@@ -1,5 +1,15 @@
+//Global Vars
 var myAudioContext, myAudio, highQual, lowQual, medQual;
+// Post Processing Params
+var params = {
+  enable: 'After',
+  exposure: 1,
+  bloomStrength: 1.5,
+  bloomThreshold: 0,
+  bloomRadius: 0,
+};
 
+// Creating my Class
 class Visualization{
     constructor(options){
         //Changeable options
@@ -20,23 +30,38 @@ class Visualization{
 
 //Start of the Init
     init(){
+        //Creating the scene
         this.scene = new THREE.Scene();
         this.windowHeight = window.innerHeight;
         this.windowWidth = window.innerWidth;
+        //Setting up scene camera
         this.camera = new THREE.PerspectiveCamera( 50, this.windowWidth / this.windowHeight, 0.1, 5000 );
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setClearColor( 0x000000, 0 );
+        //composer for my AfterimagePass
         this.composer = new THREE.EffectComposer( this.renderer );
         this.composer.addPass( new THREE.RenderPass( this.scene, this.camera ) );
+        //composer for my bloomPass
+        this.composerALT = new THREE.EffectComposer( this.renderer );
+        this.composerALT.addPass( new THREE.RenderPass( this.scene, this.camera ) );
+        //composer for my TAAPass
+        this.composerTAA = new THREE.EffectComposer( this.renderer );
+        this.composerTAA.addPass( new THREE.RenderPass( this.scene, this.camera ) );
+        //Setting camera position / Setting the size of both composers + renderer
         this.camera.position.set(0, -100, 1000);
         this.renderer.setSize(this.windowWidth, this.windowHeight);
         this.composer.setSize(this.windowWidth, this.windowHeight);
+        this.composerALT.setSize(this.windowWidth, this.windowHeight);
+        this.composerTAA.setSize(this.windowWidth, this.windowHeight);
+
         this.renderer.autoClear = false;
         this.renderer.shadowMap.enabled = true;
 				this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        //Arrays to hold method names for organization of my particles
         this.index = 0;
         this.shape = ['ring1', 'ring2', 'line', 'ring3'];
         this.octahedron = ['octc'];
+        //Inititation of my DAT GUI
         this.gui = new dat.GUI( { name: 'MyGui' } );
 
         //Setting up the Orbit Controls
@@ -45,7 +70,7 @@ class Visualization{
         // Render this to the body
         document.body.appendChild(this.renderer.domElement);
 
-        //methods
+        //methods to run
         this.render();
         this.addPostProcessing();
         this.addParticlesSet1();
@@ -76,7 +101,7 @@ class Visualization{
         myAudio = new Audio()
         this.audioObj = myAudio;
         this.audioObj.controls = true;
-        document.body.appendChild(this.audioObj);
+        document.body.appendChild(this.audioObj); // Render my audioObj to page body
 
         //Init context/analyser
         myAudioContext = new AudioContext();
@@ -86,7 +111,7 @@ class Visualization{
         this.source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
         this.bufferLength = this.analyser.frequencyBinCount;
-        this.frequencyData = new Uint8Array(this.bufferLength);
+        this.frequencyData = new Uint8Array(this.bufferLength); //Stores frequencyData
     }
 
     //Analyser for the audio
@@ -110,23 +135,53 @@ class Visualization{
         requestAnimationFrame(this.render.bind(this));
         for (let i=0; i<(this.scene.children.length)-this.segregation; i++) {
             //Choose Shape from array to render with particals
-            this[this.shape[0]](this.particlesStored1[i],i, this.frequencyData[i]);
-            this[this.shape[2]](this.particlesStored2[i],i, this.frequencyData[i]);
-            this[this.shape[1]](this.particlesStored3[i],i, this.frequencyData[i]);
-            this[this.shape[3]](this.particlesStored4[i],i, this.frequencyData[i]);
+
+            //Shape selection  //Selecting particle Array  //particle index  //Stored audio frequencies
+            this[this.shape[0]](this.particlesStored1[i], i, this.frequencyData[i]);
+            this[this.shape[2]](this.particlesStored2[i], i, this.frequencyData[i]);
+            this[this.shape[1]](this.particlesStored3[i], i, this.frequencyData[i]);
+            this[this.shape[3]](this.particlesStored4[i], i, this.frequencyData[i]);
             this[this.octahedron[0]](this.myObj[0],this.frequencyData[i]);
         }
+        if(params.enable == 'After'){ //Rendering with the afterimage composer
         this.composer.render();
+      }
+      else if(params.enable == 'Bloom'){ //Rendering with the UnrealBloom composer
+        this.composerALT.render();
+      }
+      else{
+        this.composerTAA.render();
+      }
     }
 
-    // After image post processing
     addPostProcessing(){
+    // After image post processing
     var afterimagePass = new THREE.AfterimagePass();
     afterimagePass.uniforms['damp'].value = 0.98;
   	afterimagePass.renderToScreen = true;
   	this.composer.addPass( afterimagePass );
+
+    // Bloom Pass post processing
+    var bloomPass = new THREE.UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.3, 0.5, 0.75 );
+    bloomPass.renderToScreen = true;
+    bloomPass.threshold = params.bloomThreshold;
+    bloomPass.strength = params.bloomStrength;
+    bloomPass.radius = params.bloomRadius;
+    this.composerALT.addPass( bloomPass );
+
+    var taaRenderPass = new THREE.TAARenderPass( this.scene, this.camera );
+    taaRenderPass.renderToScreen = true;
+		taaRenderPass.unbiased = false;
+    taaRenderPass.sampleLevel = 2;
+		this.composerTAA.addPass( taaRenderPass );
+
+    //Adding Datgui function to change after image value / enable  and edit UnrealBloom effect
     this.gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-    // Taa and smaaa pass do not work with AfterimagePass
+    this.gui.add( params, 'enable', ['After', 'Bloom', 'TAA']);
+    this.gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function ( value ) { bloomPass.threshold = Number( value );});
+		this.gui.add( params, 'bloomStrength', 0.0, 4.0 ).onChange( function ( value ) { bloomPass.strength = Number( value );});
+		this.gui.add( params, 'bloomRadius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) { bloomPass.radius = Number( value );});
+
     }
 
     //Window resize method
@@ -137,6 +192,8 @@ class Visualization{
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.windowWidth, this.windowHeight);
         this.composer.setSize(this.windowWidth, this.windowHeight);
+        this.composerALT.setSize(this.windowWidth, this.windowHeight);
+        this.composerTAA.setSize(this.windowWidth, this.windowHeight);
     }
 
     //Scene AmbientLight
@@ -170,7 +227,6 @@ class Visualization{
        color:0x000000,
       });
       myChildObj1 = new THREE.Mesh(this.childObj, this.childObjMat);
-      //myChildObj1.castShadow = true;
       myChildObj1.rotation.x = rotationX;
       this.gui.add( myChildObj1.rotation, 'x', 0, 5 ).step( 0.001 );
       this.scene.add(myChildObj1);
