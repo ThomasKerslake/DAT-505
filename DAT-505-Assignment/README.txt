@@ -3,6 +3,7 @@ DAT-505-Advanced-Creative-Coding  // Thomas Kerslake
 ********************************************************
 
 --- Github link [ https://github.com/ThomasKerslake/DAT-505 ]
+--- Live project link (github pages) [ https://thomaskerslake.github.io/ ]
 --- CodePen link [ https://codepen.io/thomaskerslake/ ]
 
 //How to use my audio visualization
